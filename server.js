@@ -96,14 +96,16 @@ router.post('/signin', function(req, res) {
 });
 
 //************************************************************************** Edited everything after this line
-//need to figure out how to get this to work with postman
+//THIS BLOCK OF CODE DOES NOT WORK.  WHEN I SEND A REQUEST FROM POSTMAN ALL THE DIFFERENT ROUTES ARE SKIPPED AND THERE IS
+//      JUST AN "UNAUTHORIZED" MESSAGE
+
 //need to make sure authHwtController.isAuthenticated is the one used for all the different routes
 router.route("/movies")
     .post(authJwtController.isAuthenticated,function(req, res)
     {
         console.log(req.body);
         //not done with this line yet
-        res.json({message: "Movie Saved", status: 200, headers: req.headers, query: req.query, env: process.env.SECRET_KEY});
+        res.json({message: "Movie Saved", status: 200, headers: req.headers, query: req.query, env: process.env.SECRET_KEY})
     })
     .get(authJwtController.isAuthenticated,function(req,res)//get a movie/search for one ish...
     {
