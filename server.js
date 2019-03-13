@@ -11,8 +11,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(passport.initialize());
-
 var router = express.Router();
+
+let Movie = require("./Movies");
+
+//let port = process.env.PORT || 8080; //found these two lines on google
+//app.listen(port);
 
 router.route('/postjwt')
     .post(authJwtController.isAuthenticated, function (req, res) {
@@ -101,12 +105,33 @@ router.post('/signin', function(req, res) {
 
 //need to make sure authHwtController.isAuthenticated is the one used for all the different routes
 router.route("/movies")
-    .post(authJwtController.isAuthenticated,function(req, res)
+    .post(authJwtController.isAuthenticated,function(req, res)  //create a new movie
     {
-        console.log(req.body);
-        //not done with this line yet
-        res.json({message: "Movie Saved", status: 200, headers: req.headers, query: req.query, env: process.env.SECRET_KEY})
-    })
+        //console.log(req.body);
+        /*
+        this needs to be the movie obj title find function
+            if(err)
+            {
+                console.log(err)
+
+            }
+            else
+            {
+                res.json({message: "The movie was created", status: 200, headers: req.headers, query: req.query, env: process.env.SECRET_KEY});
+
+            }
+        }
+         */
+
+        /*
+        need to check that the movie does not already exist
+            then throw an error that is does exist
+        if the movie title does not exist
+            add the whole object to the database
+        if there is an error
+            throw the error message
+        */
+        })
     .get(authJwtController.isAuthenticated,function(req,res)//get a movie/search for one ish...
     {
         console.log(req.body);
@@ -117,8 +142,8 @@ router.route("/movies")
         console.log(req.body);
         res.json({message: "Movie Updated", status:200, headers: req.headers, query: req.query, env: process.env.SECRET_KEY});
     })
-    .delete(authJwtController.isAuthenticated, function(req, res)
-    {//need to make sure that this is the correct authentication needed for the delete
+    .delete(authJwtController.isAuthenticated, function(req, res)//delete a movie
+    {
         console.log(req.body);
         res.json({message: "Movie Deleted", status: 200, headers: req.headers, query: req.query, env: process.env.SECRET_KEY});
 
@@ -131,3 +156,12 @@ router.all('*', function(req, res)  //if there is a response that the server has
 
 app.use('/', router);
 app.listen(process.env.PORT || 8080);
+
+//need to connect to mongoose some how here
+/*mongoose.connect(mongoDB, { useNewUrlParser: true },
+    {
+        //check if there is an error
+    }
+
+);
+*/
