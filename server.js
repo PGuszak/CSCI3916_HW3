@@ -13,10 +13,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
 var router = express.Router();
 
-let Movie = require("./Movies");
-
-//let port = process.env.PORT || 8080; //found these two lines on google
-//app.listen(port);
+let Movie = require("./Movies");//makes the Movie obj work from the Movies.js exports line
 
 router.route('/postjwt')
     .post(authJwtController.isAuthenticated, function (req, res) {
@@ -106,36 +103,62 @@ router.post('/signin', function(req, res) {
 //need to make sure authHwtController.isAuthenticated is the one used for all the different routes
 router.route("/movies")
     .post(authJwtController.isAuthenticated,function(req, res)  //create a new movie
-    {
-        //console.log(req.body);
-        /*
-        this needs to be the movie obj title find function
-            if(err)
+    {//in the function params cannot double up two res's, all four must be different to work
+        Movie.find({Title: req.body.Title}, function(err)
+        {
+            if (err)
             {
-                console.log(err)
+                res.status(400);
+            }
+            else if (req.data !== 0)
+            {
+                let newmovie = new Movie;
+                newmovie.Title = req.body.Title;
+                newmovie.ReleaseDate = req.body.ReleaseDate;
+                newmovie.Genre = req.body.Genre;
+                newmovie.ActorsAndCharacters.Actor0 = req.body.Actor0;
+                newmovie.ActorsAndCharacters.Character0 =  req.body.Character0;
+                newmovie.ActorsAndCharacters.Actor1 = req.body.Actor1;
+                newmovie.ActorsAndCharacters.Character1 = req.body.Character1;
+                newmovie.ActorsAndCharacters.Actor2 = req.body.Actor2;
+                newmovie.ActorsAndCharacters.Character2 = req.body.Character2;
 
+                newmovie.save(function (err) //should go straight to the db
+                {
+                    if(err) {
+                        res.json(err);
+                    }
+                    else {
+                        res.json({message: "The Movie," + newmovie.Title + ", was successfully saved", code: 200}); //there is an issue here
+                    }
+                });
             }
             else
             {
-                res.json({message: "The movie was created", status: 200, headers: req.headers, query: req.query, env: process.env.SECRET_KEY});
-
+                res.json(err);//don't delete this!!!! this makes the .save work for what ever reason!!!
+                res.json ({message: "There is a duplicate/missing information in this entry", code: 406});
             }
-        }
-         */
-
-        /*
-        need to check that the movie does not already exist
-            then throw an error that is does exist
-        if the movie title does not exist
-            add the whole object to the database
-        if there is an error
-            throw the error message
-        */
-        })
+        });
+    })
     .get(authJwtController.isAuthenticated,function(req,res)//get a movie/search for one ish...
     {
-        console.log(req.body);
-        res.json({ status: 200, message: "Movie Found", headers: req.headers, query: req.query, env: process.env.SECRET_KEY});
+        /*Movie.find({Title: req.body.Title}, function(err)
+        {
+            if (err)
+            {
+                res.json({message: "there was an issue trying to find your movie"})
+            }
+            else if (req.data === 0)//used from the function above to make sure there is nothing wrong
+            {
+                res.json({message: "The Movie " + req.body.Title + "was found"});
+            }
+            else//if there is no error and the movie is not found
+            {
+                res.json({message: "There is no record with that title"});
+            }
+        })*/
+        //res.json({ status: 200, message: "Movie Found", headers: req.headers, query: req.query, env: process.env.SECRET_KEY});
+        //just use the find function from above and print out if there is a record that is found.
     })
     .put(authJwtController.isAuthenticated, function(req, res)//movie updated
     {

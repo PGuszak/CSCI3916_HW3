@@ -1,6 +1,11 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
+//got these three lines from the User.js
+mongoose.Promise = global.Promise;
+mongoose.connect(process.env.DB, { useNewUrlParser: true } );
+mongoose.set('useCreateIndex', true);
+
 var MovieSchema = new Schema ({
     Title: {type: String, required: true, unique: true},
     ReleaseDate: {type: Number, required: true, unique: true},
@@ -8,11 +13,11 @@ var MovieSchema = new Schema ({
         required: true, unique: true},
     ActorsAndCharacters:
         {
-            ActorName0: {type: String, required: true, unique:true},
+            Actor0: {type: String, required: true, unique:true},
             Character0: {type: String, required: true, unique: true},
-            ActorName1: {type: String, required: true, unique:true},
+            Actor1: {type: String, required: true, unique:true},
             Character1: {type: String, required: true, unique: true},
-            ActorName2: {type: String, required: true, unique:true},
+            Actor2: {type: String, required: true, unique:true},
             Character2: {type: String, required: true, unique: true},
         },
 });
