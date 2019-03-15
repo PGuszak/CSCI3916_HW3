@@ -61,7 +61,7 @@ router.post('/signup', function(req, res) {
         user.save(function(err) {
             if (err) {
                 // duplicate entry
-                if (err.code == 11000)
+                if (err.code === 11000)
                     return res.json({ success: false, message: 'A user with that username already exists. '});
                 else
                     return res.send(err);
@@ -104,7 +104,7 @@ router.post('/signin', function(req, res) {
 router.route("/movies")
     .post(authJwtController.isAuthenticated,function(req, res)  //create a new movie
     {//in the function params cannot double up two res's, all four must be different to work
-        Movie.findOne({Title: req.body.Title}, function(err)//for whatever reason this only allows one movie into the db at a time
+        Movie.findOne({Title: req.body.Title}, function(err, )//for whatever reason this only allows one movie into the db at a time
         {
             if (err)
             {
@@ -122,59 +122,88 @@ router.route("/movies")
                 newmovie.ActorsAndCharacters.Actor2 = req.body.Actor2;
                 newmovie.ActorsAndCharacters.Character2 = req.body.Character2;
 
+                //console.log(newmovie);
                 newmovie.save(function (err)
                 {
                     if (err)
                     {
-                        // duplicate entry
-                        if (err.code === 11000)//this error code is about if the id is the same
-                            return res.json({success: false, message: "Sorry there is already a movie with that ID"});
-                        else
-                            return res.send(err);
+                       res.json({message: err});
+                    }
+                    else
+                    {
+                        res.json({status: 200, success: true, message: "The movie " + req.body.Title + " has been successfully saved!"});
                     }
 
-                    res.json({status: 200, success: true, message: "The movie " + req.body.Title + " has been successfully saved!"});
                 });
             }
         });
     })
     .get(authJwtController.isAuthenticated,function(req,res)//get a movie/search for one ish...
     {
-        Movie.find({Title: req.body.Title}, function(err)//NOT WORKING!!!!!!!!!!!!!!!
+        Movie.find({Title: req.body.Title}, function(err, data)
         {
-            /*if (err)
+            if (err)
             {
                 res.json(err);
-                res.json({message: "there was an issue trying to find your movie"})
+                res.json({message: "There was an issue trying to find your movie"})
             }
-            else if ()
+            else if (data.length === 0)
             {   //don't think this is correct
                 res.json({message: "The Movie " + req.body.Title + " was not found"});
             }
             else//if there is no error and the movie is not found
             {
                 res.json({message: "The movie with " + req.body.Title + " was found!"});
-            }*/
+            }
         })
         //res.json({ status: 200, message: "Movie Found", headers: req.headers, query: req.query, env: process.env.SECRET_KEY});
         //just use the find function from above and print out if there is a record that is found.
     })
-    .put(authJwtController.isAuthenticated, function(req, res)//movie updated
+    .put(authJwtController.isAuthenticated,function(req,res)//get a movie/search for one ish...
     {
-        /*
-        if err
-            print err
-        if found
-            set equal the values of the req.body to all the ones of the incoming updated one
-        else
-            there is no movie with that title
-            res.jon({message: "there is no movie with that title"});
-         */
-        console.log(req.body);
-        res.json({message: "Movie Updated", status:200, headers: req.headers, query: req.query, env: process.env.SECRET_KEY});
+        Movie.findOneAndUpdate({Title: req.body.Title},
+        {
+            Title: req.body.Title,
+            ReleaseDate: req.body.ReleaseDate,
+            Genre: req.body.Genre,
+            Actor0: req.body.Actor0,
+            Character0: req.body.Character0,
+            Actor1: req.body.Character1,
+            Character1: req.body.Character1,
+            Actor2: req.body.Actor2,
+            Character2: req.body.Character2
+        },function(err, data)
+            {
+                if(err)
+                {
+                    res.json({message: err});
+                }
+                else
+                {
+                    console.log("worked");
+                }
+
+            });
+        //res.json({ status: 200, message: "Movie Found", headers: req.headers, query: req.query, env: process.env.SECRET_KEY});
+        //just use the find function from above and print out if there is a record that is found.
     })
     .delete(authJwtController.isAuthenticated, function(req, res)//delete a movie
     {
+        /*Movie.findOne({Title: req.body.Title}, function(err)//for whatever reason this only allows one movie into the db at a time
+        {
+            if(err)
+            {
+                res.json(err);
+            }
+            else if()
+            {
+
+            }
+            else
+            {
+                res.json()
+            }
+        }*/
         /*
         try and match the title to one that exists
             if there is an err
