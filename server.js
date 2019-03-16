@@ -138,22 +138,22 @@ router.route("/movies")
             }
         });
     })
-    .get(authJwtController.isAuthenticated,function(req,res)//get a movie/search for one ish...
+    .get(authJwtController.isAuthenticated,function(req,res)//search for a movie
     {
         Movie.find({Title: req.body.Title}, function(err, data)
         {
-            if (err)
+            if (err)//if there is any err, print the err and response message
             {
                 res.json(err);
                 res.json({message: "There was an issue trying to find your movie"})
             }
-            else if (data.length === 0)
+            else if (data.length === 0)//if there is no return of data the movie was not found
             {   //don't think this is correct
                 res.json({message: "The Movie " + req.body.Title + " was not found"});
             }
-            else//if there is no error and the movie is not found
+            else//if there is no error and there is data which means we found the movie due to the find function
             {
-                res.json({message: "The movie with " + req.body.Title + " was found!"});
+                res.json({status: 200, message: "The movie with " + req.body.Title + " was found!"});
             }
         })
         //res.json({ status: 200, message: "Movie Found", headers: req.headers, query: req.query, env: process.env.SECRET_KEY});
@@ -166,21 +166,22 @@ router.route("/movies")
             Title: req.body.Title,
             ReleaseDate: req.body.ReleaseDate,
             Genre: req.body.Genre,
-            Actor0: req.body.Actor0,
-            Character0: req.body.Character0,
-            Actor1: req.body.Character1,
-            Character1: req.body.Character1,
-            Actor2: req.body.Actor2,
-            Character2: req.body.Character2
-        },function(err, data)
+            ActorsAndCharacters: req.body.ActorsAndCharacters//becasue ActorsAndCharacters is the parent schema for the three actors and characters
+        },function(err,data)
             {
                 if(err)
                 {
                     res.json({message: err});
+                    res.json({message: "There was an issue trying to update your movie."})
+                }
+                else if(data.length === 0)
+                {
+                    res.json({message: "Sorry the movie wanted to update was not found in the data base."});
                 }
                 else
                 {
-                    console.log("worked");
+                    res.json({status: 200, message: "The Movie " + req.body.Title + " has been updated!!"});
+
                 }
 
             });
@@ -189,33 +190,22 @@ router.route("/movies")
     })
     .delete(authJwtController.isAuthenticated, function(req, res)//delete a movie
     {
-        /*Movie.findOne({Title: req.body.Title}, function(err)//for whatever reason this only allows one movie into the db at a time
+        Movie.findOneAndDelete({Title: req.body.Title}, function(err, data)//got this code from the get request method
         {
-            if(err)
+            if (err)
             {
                 res.json(err);
+                res.json({message: "There was an issue trying to find your movie"})
             }
-            else if()
+            else if (data.length === null)
+            {   //don't think this is correct
+                res.json({message: "The Movie " + req.body.Title + " was not found"});
+            }
+            else//if there is no error and the movie is not found
             {
-
+                res.json({message: "The movie with " + req.body.Title + " was deleted!"});
             }
-            else
-            {
-                res.json()
-            }
-        }*/
-        /*
-        try and match the title to one that exists
-            if there is an err
-                print err
-            if title is found
-                delete the whole record with that tile
-            else
-                there was no movie with that title
-         */
-        console.log(req.body);
-        res.json({message: "Movie Deleted", status: 200, headers: req.headers, query: req.query, env: process.env.SECRET_KEY});
-
+        })
     });
 
 router.all('*', function(req, res)  //if there is a response that the server has no way to handle.
