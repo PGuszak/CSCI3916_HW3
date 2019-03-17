@@ -167,14 +167,14 @@ router.route("/movies")
             ReleaseDate: req.body.ReleaseDate,
             Genre: req.body.Genre,
             ActorsAndCharacters: req.body.ActorsAndCharacters//becasue ActorsAndCharacters is the parent schema for the three actors and characters
-        },function(err, data)//originally had (err and data) but I needed doc becasuse I had to switch to use Search to have Heroku work
-            {//becasue Heroku will not wprk using findOneAndUpdate unless you have .Search
+        },function(err,doc)//originally had (err and data) but I needed doc becasuse I had to switch to use Search to have Heroku work
+            {//because Heroku will not work using findOneAndUpdate unless you have .Search and doc, as opposed to .Search and data.length
                 if(err)
                 {
                     res.json({message: err});
                     res.json({message: "There was an issue trying to update your movie."})
                 }
-                else if(data.length === 0)
+                else if(doc === 0)
                 {
                     res.json({message: "Sorry the movie wanted to update was not found in the data base."});
                 }
