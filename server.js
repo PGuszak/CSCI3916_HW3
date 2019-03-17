@@ -161,20 +161,20 @@ router.route("/movies")
     })
     .put(authJwtController.isAuthenticated,function(req,res)//get a movie/search for one ish...
     {
-        Movie.findOneAndUpdate({Title: req.body.Search},
+        Movie.findOneAndUpdate({Title: req.body.Search},//originally had .Title but it didn't work with the function(doc)
         {
             Title: req.body.Title,
             ReleaseDate: req.body.ReleaseDate,
             Genre: req.body.Genre,
             ActorsAndCharacters: req.body.ActorsAndCharacters//becasue ActorsAndCharacters is the parent schema for the three actors and characters
-        },function(err,doc)
-            {
+        },function(err, data)//originally had (err and data) but I needed doc becasuse I had to switch to use Search to have Heroku work
+            {//becasue Heroku will not wprk using findOneAndUpdate unless you have .Search
                 if(err)
                 {
                     res.json({message: err});
                     res.json({message: "There was an issue trying to update your movie."})
                 }
-                else if(doc === 0)
+                else if(data.length === 0)
                 {
                     res.json({message: "Sorry the movie wanted to update was not found in the data base."});
                 }
