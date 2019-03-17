@@ -161,20 +161,20 @@ router.route("/movies")
     })
     .put(authJwtController.isAuthenticated,function(req,res)//get a movie/search for one ish...
     {
-        Movie.findOneAndUpdate({Title: req.body.Title},
+        Movie.findOneAndUpdate({Title: req.body.Search},
         {
             Title: req.body.Title,
             ReleaseDate: req.body.ReleaseDate,
             Genre: req.body.Genre,
             ActorsAndCharacters: req.body.ActorsAndCharacters//becasue ActorsAndCharacters is the parent schema for the three actors and characters
-        },function(err,data)
+        },function(err,doc)
             {
                 if(err)
                 {
                     res.json({message: err});
                     res.json({message: "There was an issue trying to update your movie."})
                 }
-                else if(data.length === 0)
+                else if(doc === 0)
                 {
                     res.json({message: "Sorry the movie wanted to update was not found in the data base."});
                 }
