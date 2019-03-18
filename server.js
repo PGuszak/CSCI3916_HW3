@@ -104,23 +104,22 @@ router.post('/signin', function(req, res) {
 router.route("/movies")
     .post(authJwtController.isAuthenticated,function(req, res)  //create a new movie
     {//in the function params cannot double up two res's, all four must be different to work
-        Movie.findOne({Title: req.body.Title}, function(err, )//for whatever reason this only allows one movie into the db at a time
+        Movie.findOne({Title: req.body.Title}, function(err)//for whatever reason this only allows one movie into the db at a time
         {
             if (err)
             {
                 res.status(400);
+            }
+            else if(req.body.ActorsAndCharacters.length < 3)
+            {
+                res.json({message: "You must have at least 3 actors and characters per movie!"});
             }
             else if (req.data !== 0) {
                 let newmovie = new Movie;
                 newmovie.Title = req.body.Title;
                 newmovie.ReleaseDate = req.body.ReleaseDate;
                 newmovie.Genre = req.body.Genre;
-                newmovie.ActorsAndCharacters.Actor0 = req.body.Actor0;
-                newmovie.ActorsAndCharacters.Character0 = req.body.Character0;
-                newmovie.ActorsAndCharacters.Actor1 = req.body.Actor1;
-                newmovie.ActorsAndCharacters.Character1 = req.body.Character1;
-                newmovie.ActorsAndCharacters.Actor2 = req.body.Actor2;
-                newmovie.ActorsAndCharacters.Character2 = req.body.Character2;
+                newmovie.ActorsAndCharacters = req.body.ActorsAndCharacters;
 
                 //console.log(newmovie);
                 newmovie.save(function (err)
@@ -133,7 +132,6 @@ router.route("/movies")
                     {
                         res.json({status: 200, success: true, message: "The movie " + req.body.Title + " has been successfully saved!"});
                     }
-
                 });
             }
         });
